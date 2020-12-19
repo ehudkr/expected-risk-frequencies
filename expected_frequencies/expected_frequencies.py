@@ -213,8 +213,9 @@ def _plot_isotype_array(baseline_ef, exposed_ef, population_size=100, title="", 
     baseline_ef = round(baseline_ef)
     exposed_ef = round(exposed_ef)
 
+    exposed_color = "#FA5765"  # "#4078EF",  # Exposed (2)  # Follow RealRisk color scheme
     if exposed_ef < baseline_ef:
-        raise NotImplementedError("Icon array cannot (yet) plot risk reduction.")
+        exposed_color = "#C5CAD4"
 
     data = __generate_chart_source_data(baseline_ef, exposed_ef, population_size)
 
@@ -239,8 +240,7 @@ def _plot_isotype_array(baseline_ef, exposed_ef, population_size=100, title="", 
                 range=[
                     "#FFFFFF",  # Population (0)
                     "#4A5568",  # Baseline (1)
-                    "#FA5765",  # Exposed (2)
-                    # "#4078EF",  # Exposed (2)  # Follow RealRisk color scheme
+                    exposed_color,  # Exposed (2)
                 ]),
             # TODO: add uncertainty using shade: lighter color fill of icons in the 95% CI.
             legend=None),
@@ -276,7 +276,8 @@ def __generate_chart_source_data(baseline_ef, exposed_ef, population_size):
         for row in data[baseline_ef:exposed_ef]:
             row['hue'] = 2  # data.iloc[baseline_ef:exposed_ef]['hue'] = "Exposed"
     else:  # Baseline units to "remove" from the outcome
-        for row in data[baseline_ef - exposed_ef:exposed_ef]:
+        for row in data[baseline_ef - exposed_ef:baseline_ef]:
+            row['hue'] = 2
             row['reduced'] = True  # data.iloc[baseline_ef:exposed_ef]['reduced'] = True
     data = alt.Data(values=data)
     return data
