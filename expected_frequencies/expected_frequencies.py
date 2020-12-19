@@ -15,11 +15,13 @@ PERSON_SHAPE = (
         "-0.1h0.2c0.3 0 0.6 -0.3 0.6 -0.6v-2c0.2 -0.3 -0.1 "
         "-0.6 -0.4 -0.6z"
     )
+CROSS_SHAPE = "M -1.7 -2.5 L 2.5 3.5"
 
 
 def plot_expected_frequencies(baseline_risk, added_risk, added_risk_type, population_size=100,
                               title="", configure_chart=True,
                               icon_shape=PERSON_SHAPE, icon_size=75, stroke_color="black", stroke_width=1.3,
+                              cross_shape=CROSS_SHAPE, cross_width=None,
                               chart_width=350, chart_height=400):
     """Plots an icon array (isotype grid) of expected frequencies.
 
@@ -48,7 +50,12 @@ def plot_expected_frequencies(baseline_risk, added_risk, added_risk_type, popula
                    Contour around the person icon.
                    A legal color value Altair can read. Pass False if you wish to not draw contour.
     stroke_width : float, optional
-                   The thickness of the icon's contour
+                   The thickness of the icon's contour.
+    cross_shape : str, optional
+                  SVG path of some cross mark to overlay over the icon shape.
+                  Default is a diagonal cross mark (\).
+    cross_width : float, optional
+                  Stroke thickness of the cross shape. If not provided, a reasonable one is calculated.
     chart_width : int, optional
     chart_height : int, optional
 
@@ -64,6 +71,7 @@ def plot_expected_frequencies(baseline_risk, added_risk, added_risk_type, popula
     chart = _plot_isotype_array(baseline_ef, exposed_ef, population_size,
                                 title, configure_chart,
                                 icon_shape, icon_size, stroke_color, stroke_width,
+                                cross_shape, cross_width,
                                 chart_width, chart_height)
     return chart
 
@@ -207,31 +215,35 @@ def _generate_text(baseline_ef, exposed_ef, population_size, precision,
 
 def _plot_isotype_array(baseline_ef, exposed_ef, population_size=100, title="", configure_chart=True,
                         icon_shape=PERSON_SHAPE, icon_size=75, stroke_color="black", stroke_width=1.3,
+                        cross_shape=CROSS_SHAPE, cross_width=None,
                         chart_width=350, chart_height=400):
     if isinstance(baseline_ef, float) or isinstance(exposed_ef, float):
         warnings.warn("Can't currently plot (color) fractional icons. Rounding to nearest integer.")
     baseline_ef = round(baseline_ef)
     exposed_ef = round(exposed_ef)
 
-    if exposed_ef < baseline_ef:
-        raise NotImplementedError("Icon array cannot (yet) plot risk reduction.")
-
     data = __generate_chart_source_data(baseline_ef, exposed_ef, population_size)
 
     root = round(math.sqrt(population_size))  # Create a square grid of total `population_size`
 
     # https://altair-viz.github.io/gallery/isotype_grid.html
-    chart = alt.Chart(data).transform_calculate(
+    base_chart = alt.Chart(data).transform_calculate(
         row=f"ceil(datum.id/{root})",
         col=f"datum.id - datum.row*{root}",
-    ).mark_point(
+    ).encode(
+        x=alt.X("col:O", axis=None),
+        y=alt.Y("row:O", axis=None),
+    ).properties(
+        width=chart_width,
+        height=chart_height,
+        title=title if title else ""
+    )
+    icons = base_chart.mark_point(
         filled=True,
         stroke=stroke_color,
         strokeWidth=stroke_width,  # 2,
         size=icon_size,
     ).encode(
-        x=alt.X("col:O", axis=None),
-        y=alt.Y("row:O", axis=None),
         color=alt.Color(
             'hue:N',
             scale=alt.Scale(
@@ -239,17 +251,34 @@ def _plot_isotype_array(baseline_ef, exposed_ef, population_size=100, title="", 
                 range=[
                     "#FFFFFF",  # Population (0)
                     "#4A5568",  # Baseline (1)
-                    "#FA5765",  # Exposed (2)
-                    # "#4078EF",  # Exposed (2)  # Follow RealRisk color scheme
+                    "#FA5765",  # Exposed (2)  "#4078EF"
                 ]),
             # TODO: add uncertainty using shade: lighter color fill of icons in the 95% CI.
             legend=None),
         shape=alt.ShapeValue(icon_shape),
-    ).properties(
-        width=chart_width,
-        height=chart_height,
-        title=title if title else ""
     )
+    chart = icons
+    if exposed_ef < baseline_ef:
+        stroke_out = base_chart.mark_point(
+            # shape="cross",
+            filled=True,
+            stroke="#4078EF",  # "black"
+            # strokeWidth=cross_width,
+            strokeWidth=math.sqrt(icon_size) / 1.7 if cross_width is None else cross_width,
+            strokeCap="round",
+            size=icon_size,
+        ).encode(
+            shape=alt.ShapeValue(cross_shape),
+            opacity=alt.Opacity(
+                'reduced:N',
+                legend=None,
+                scale=alt.Scale(
+                    domain=[False, True],
+                    range=[0, 1]
+                ),
+            )
+        )
+        chart += stroke_out
     if configure_chart:  # Configured charts cannot be later concatenated.
         chart = chart.configure_title(
             align="left",
@@ -276,7 +305,7 @@ def __generate_chart_source_data(baseline_ef, exposed_ef, population_size):
         for row in data[baseline_ef:exposed_ef]:
             row['hue'] = 2  # data.iloc[baseline_ef:exposed_ef]['hue'] = "Exposed"
     else:  # Baseline units to "remove" from the outcome
-        for row in data[baseline_ef - exposed_ef:exposed_ef]:
+        for row in data[baseline_ef - exposed_ef:baseline_ef]:
             row['reduced'] = True  # data.iloc[baseline_ef:exposed_ef]['reduced'] = True
     data = alt.Data(values=data)
     return data

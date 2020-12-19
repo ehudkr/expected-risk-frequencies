@@ -21,7 +21,16 @@ result.chart.show()
 ```
 ![Isotype-grid plot](isotype_grid.png)
 
-
+Risk reduction looks slightly different:
+```python
+from expected_frequencies import  plot_expected_frequencies
+baseline_risk = 43.7 / 100
+odds_ratio = 0.36
+chart = plot_expected_frequencies(
+    baseline_risk, odds_ratio, "odds_ratio",
+)
+```
+![isotype grid for risk reduction](isotype_grid_reduction.png)
 
 ## Additional Functionality
 ### Multiple panels:

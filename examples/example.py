@@ -85,3 +85,13 @@ chart = plot_expected_frequencies(
 alt_save(chart, "examples/cow_chart.png",
          method='selenium', webdriver=webdriver)
 
+
+# Risk reduction
+baseline_risk = 43.7 / 100
+odds_ratio = 0.36
+chart = plot_expected_frequencies(
+    baseline_risk, odds_ratio, "odds_ratio",
+)
+alt_save(chart, "examples/isotype_grid_reduction.png",
+         method='selenium', webdriver=webdriver
+         )
