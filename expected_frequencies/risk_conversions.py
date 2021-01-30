@@ -9,7 +9,6 @@ def __odds_ratio_to_risk_ratio(baseline_risk, odds_ratio):
 def __hazard_ratio_to_risk_ratio(baseline_risk, hazard_ratio):
     # https://stats.stackexchange.com/a/309095/153005
     rr = (1 - (1 - baseline_risk) ** hazard_ratio) / baseline_risk
-    rr = hazard_ratio  # RealRisk treats HR as RR
     return rr
 
 
