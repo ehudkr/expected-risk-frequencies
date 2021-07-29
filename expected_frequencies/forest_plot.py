@@ -74,7 +74,6 @@ def plot_forest(
             neutral=neutral,
             logscale=logscale,
             tooltip=tooltip,
-            configure=configure,
         )
     else:
         chart = plot_single_forest(
@@ -86,15 +85,17 @@ def plot_forest(
             tooltip=tooltip,
             with_text=with_text,
             precision=precision,
-            configure=configure,
         )
-
     # chart = chart.properties(
     #     title={
     #         'text': title,
     #         # 'anchor': 'middle'
     #     }  # Avoid explicit `configure_title`
     # )
+    if configure:
+        chart = chart.configure_view(
+            strokeWidth=0
+        )
     return chart
 
 
@@ -107,7 +108,6 @@ def plot_single_forest(
     tooltip=True,
     with_text=False,
     precision=2,
-    configure=True,
 ):
     if tooltip:
         tooltip = data.columns.tolist()
@@ -158,10 +158,6 @@ def plot_single_forest(
             x="shared",
         )
 
-    if configure:
-        forest_chart = forest_chart.configure_view(
-            strokeWidth=0
-        )
     return forest_chart
 
 
@@ -174,7 +170,6 @@ def plot_facet_forest(
     neutral=None,
     logscale=False,
     tooltip=True,
-    configure=True,
 ):
     base = alt.Chart(
         data=data,
@@ -242,14 +237,9 @@ def plot_facet_forest(
     forest_chart = forest_chart.facet(
         row=row,
         column=column,
+        spacing=13,
     )
 
-    if configure:
-        forest_chart = forest_chart.configure_view(
-            strokeWidth=0,
-        ).configure_facet(
-            spacing=13,  # TODO: row: 13, column: 5
-        )
     return forest_chart
 
 
