@@ -14,7 +14,7 @@ def plot_forest(
     tooltip=True,
     with_text=False,
     precision=2,
-    configure=True,  # TODO: rename to "remove border"?
+    configure=True,
 ):
     """Plots a forest plot:
     A point plot surrounded with error bars.
@@ -50,7 +50,9 @@ def plot_forest(
     precision : int
         How many decimals to use in the text.
     configure : bool
-        Whether to remove panels' borders
+        Whether to do some prettifying of the chart
+        (like remove panels' borders).
+        Can make the Chart less editable if do.
 
     Returns
     -------
