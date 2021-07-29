@@ -139,8 +139,7 @@ def plot_single_forest(
             axis='columns',
             # kwargs:
             x=x,
-            lower=lower,
-            upper=upper,
+            lower=lower, upper=upper,
             precision=precision,
         )
         text_chart = base.mark_text(
@@ -173,20 +172,6 @@ def plot_single_forest(
             strokeWidth=0
         )
     return forest_chart
-
-
-def _format_effect_text(
-    row,
-    x,
-    lower=None,
-    upper=None,
-    precision=2,
-):
-    text = f"{row[x]:.{precision}f}"
-    if lower and upper:
-        text += " "
-        text += f"[{row[lower]:.{precision}f}, {row[upper]:.{precision}f}]"
-    return text
 
 
 def plot_facet_forest(
@@ -317,6 +302,20 @@ def _get_no_effect_rule(neutral, chart=None):
         x=alt.X('neutral:Q')
     )
     return neutral_threshold
+
+
+def _format_effect_text(
+    row,
+    x,
+    lower=None,
+    upper=None,
+    precision=2,
+):
+    text = f"{row[x]:.{precision}f}"
+    if lower and upper:
+        text += " "
+        text += f"[{row[lower]:.{precision}f}, {row[upper]:.{precision}f}]"
+    return text
 
 
 
