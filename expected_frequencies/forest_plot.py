@@ -11,6 +11,7 @@ def plot_forest(
     panel=None,
     neutral=None,
     logscale=False,
+    tooltip=True,
     with_text=False,
     precision=2,
     configure=True,  # TODO: rename to "remove border"?
@@ -41,6 +42,8 @@ def plot_forest(
         Specifying a value of no-effect (e.g., 1.0 for odds-ratio or risk-ratios)
     logscale : bool
         Whether to plot the x-axis in log-scale
+    tooltip : bool
+        Add interactive tooltip overlay with data
     with_text : bool
         Whether to add textual description of the effect.
         Only works if `hue` or `panel` are not specified.
@@ -68,6 +71,7 @@ def plot_forest(
             panel=panel,
             neutral=neutral,
             logscale=logscale,
+            tooltip=tooltip,
             configure=configure,
         )
     else:
@@ -77,6 +81,7 @@ def plot_forest(
             lower=lower, upper=upper,
             neutral=neutral,
             logscale=logscale,
+            tooltip=tooltip,
             with_text=with_text,
             precision=precision,
             configure=configure,
@@ -96,13 +101,17 @@ def plot_single_forest(
     lower=None, upper=None,
     neutral=None,
     logscale=False,
+    tooltip=True,
     with_text=False,
     precision=2,
     configure=True,
 ):
+    if tooltip:
+        tooltip = data.columns.tolist()
+
     base = alt.Chart(data)
 
-    forest_chart = _get_forest_points(x, y, logscale, data, base)
+    forest_chart = _get_forest_points(x, y, logscale, tooltip, base)
 
     if lower and upper:
         error_bars = _get_error_bars(y, lower, upper, base)
@@ -161,6 +170,7 @@ def plot_facet_forest(
     panel=None,
     neutral=None,
     logscale=False,
+    tooltip=True,
     configure=True,
 ):
     base = alt.Chart(
@@ -169,10 +179,13 @@ def plot_facet_forest(
         width=600 / data[panel].nunique() if panel else alt.Undefined,
     )
 
+    if tooltip:
+        tooltip = data.columns.tolist()
+
     if hue:  # TODO: explain
         hue, y = y, hue
 
-    forest_chart = _get_forest_points(x, y, logscale, data, base)
+    forest_chart = _get_forest_points(x, y, logscale, tooltip, base)
     if hue:
         forest_chart = forest_chart.encode(
             y=alt.Y(
@@ -235,7 +248,7 @@ def plot_facet_forest(
     return forest_chart
 
 
-def _get_forest_points(x, y, logscale, data, chart=None):
+def _get_forest_points(x, y, logscale, tooltip=None, chart=None):
     forest_chart = chart.mark_point(
         filled=True,
         opacity=1,
@@ -256,7 +269,7 @@ def _get_forest_points(x, y, logscale, data, chart=None):
             y,
         ),
         # size=alt.value(80),  # size=alt.Size(p_val_name)
-        tooltip=data.columns.tolist(),
+        tooltip=tooltip if tooltip else [],
     )
     return forest_chart
 
