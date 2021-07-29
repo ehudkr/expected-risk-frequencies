@@ -65,6 +65,16 @@ result = expected_frequencies(
 result.chart.show()
 ```
 
+
+# Forest plot
+A more technical method to display multiple risk factors is with a forest plot.    
+Here, they can be displayed with additional text
+![Forest-plot with text](examples/forest_plot-text.png)
+Or as multi-panel and/or color-grouping plot
+![Multi-panel colored forest-plot](examples/forest_plot-colored_panels.png)
+
+
+
 ### Dependencies
 The package is dependent on:
 * Altair >= 4.1.0 (may also work with previous versions, but not tested)

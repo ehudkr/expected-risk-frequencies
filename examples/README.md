@@ -83,3 +83,77 @@ chart = plot_expected_frequencies(
 )
 ```
 ![Isotype-grid of cats](cat_chart.png)
+
+
+## Forest plots
+Generate forest plot with text:
+```python
+from expected_frequencies import forest_plot
+chart = forest_plot(
+    x="risk_ratio", y="outcome",
+    data=data,
+    lower="ci_lower", upper="ci_upper",
+    neutral=1.0,
+    logscale=True,
+    with_text=True,  # <- Set to `True` 
+    text_decimals=2,
+    configure=True,
+).properties(
+    title="Risk associated with treatment"
+)
+```
+![Forest-plot with text](forest_plot-text.png)
+
+Generate forest plot with groupings:
+```python
+from expected_frequencies import forest_plot
+chart = forest_plot(
+    x="risk_ratio", y="outcome",
+    data=data,
+    hue="model",  # <- Map a data variable to `hue`
+    panel=None,
+    lower="ci_lower", upper="ci_upper",
+    neutral=1.0,
+    logscale=False,
+).properties(
+    title="Risk associated with treatment"
+)
+```
+![Forest-plot with colored grouping](forest_plot-colored.png)
+
+Generate multi-panel forest plot
+```python
+from expected_frequencies import forest_plot
+chart = forest_plot(
+    x="risk_ratio", y="outcome",
+    data=data,
+    hue=None,
+    panel="model",  # <- Map a data variable to `panel`
+    lower="ci_lower", upper="ci_upper",
+    neutral=1.0,
+    logscale=True,
+).properties(
+    title="Risk associated with treatment"
+)
+```
+![Multi-panel forest-plot](forest_plot-column_panels.png)
+
+Both colored and multi-panel plots are also possible:
+```python
+from expected_frequencies import forest_plot
+
+chart = forest_plot(
+    x="risk_ratio", y="outcome",
+    data=data,
+    hue="hypothesis",
+    panel="model",
+    lower="ci_lower", upper="ci_upper",
+    neutral=1.0,
+    logscale=True,
+    tooltip=False,
+    configure=True,
+).properties(
+    title="Risk associated with treatment"
+)
+```
+![Multi-panel colored forest-plot](forest_plot-colored_panels.png)
