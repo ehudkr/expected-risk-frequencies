@@ -8,7 +8,6 @@ def plot_forest(
     hue=None,
     lower=None, upper=None,
     p_val=None,
-    groupby=None,  # TODO: Needed? or is it hue?
     panel=None,
     # TODO: add logscale
     neutral=None,
@@ -27,7 +26,7 @@ def plot_forest(
         y-axis variable in `data` (should be categorical)
     data : pd.DataFrame
         Long format DataFrame with columns mapping to the parameters here
-        `x`, `y`, `hue`, `lower`, `upper`, `groupby`, `panel`.
+        `x`, `y`, `hue`, `lower`, `upper`, `panel`.
     hue : str, int, Hashable, optional
         Color variable in `data`
     lower : str, int, Hashable, optional
@@ -36,8 +35,6 @@ def plot_forest(
         Upper bound of confidence interval variable in `data`
     p_val : str, int, Hashable, optional
         P-value vriable in `data`.
-    groupby : str, int, Hashable, optional
-        Group y-axis levels, a variable in `data`
     panel : str, int, Hashable, optional
         Specifying column panels, a variable in `data
     neutral : float, optional
@@ -66,7 +63,6 @@ def plot_forest(
             data=data,
             hue=hue,
             lower=lower, upper=upper,
-            groupby=groupby,
             panel=panel,
             neutral=neutral,
             configure=configure,
@@ -192,7 +188,6 @@ def plot_facet_forest(
     data,
     hue=None,
     lower=None, upper=None,
-    groupby=None,  # TODO: Needed? or is it hue?
     panel=None,
     neutral=None,
     configure=True,
