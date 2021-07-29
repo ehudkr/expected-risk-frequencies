@@ -13,7 +13,7 @@ def forest_plot(
     logscale=False,
     tooltip=True,
     with_text=False,
-    precision=2,
+    text_decimals=2,
     configure=True,
 ):
     """Plots a forest plot:
@@ -47,7 +47,7 @@ def forest_plot(
     with_text : bool
         Whether to add textual description of the effect.
         Only works if `hue` or `panel` are not specified.
-    precision : int
+    text_decimals : int
         How many decimals to use in the text.
     configure : bool
         Whether to do some prettifying of the chart
@@ -84,7 +84,7 @@ def forest_plot(
             logscale=logscale,
             tooltip=tooltip,
             with_text=with_text,
-            precision=precision,
+            text_decimals=text_decimals,
         )
     # chart = chart.properties(
     #     title={
@@ -107,7 +107,7 @@ def plot_single_forest(
     logscale=False,
     tooltip=True,
     with_text=False,
-    precision=2,
+    text_decimals=2,
 ):
     if tooltip:
         tooltip = data.columns.tolist()
@@ -131,7 +131,7 @@ def plot_single_forest(
             # kwargs:
             x=x,
             lower=lower, upper=upper,
-            precision=precision,
+            text_decimals=text_decimals,
         )
         text_chart = base.mark_text(
             align='left'
@@ -303,11 +303,11 @@ def _format_effect_text(
     x,
     lower=None,
     upper=None,
-    precision=2,
+    text_decimals=2,
 ):
-    text = f"{row[x]:.{precision}f}"
+    text = f"{row[x]:.{text_decimals}f}"
     if lower and upper:
         text += " "
-        text += f"[{row[lower]:.{precision}f}, {row[upper]:.{precision}f}]"
+        text += f"[{row[lower]:.{text_decimals}f}, {row[upper]:.{text_decimals}f}]"
     return text
 
