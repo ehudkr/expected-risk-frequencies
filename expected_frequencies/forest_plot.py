@@ -185,7 +185,11 @@ def plot_facet_forest(
     if tooltip:
         tooltip = data.columns.tolist()
 
-    if hue:  # TODO: explain
+    if hue:
+        # Altair has a counter-seaborn approach, where the `hue` is an outer facet (`row`),
+        # rather than an inner groupby.
+        # to conform to (the more intuitive) seaborn approach, and keep code general,
+        # Color and y-axis are swapped
         hue, y = y, hue
 
     forest_chart = _get_forest_points(x, y, logscale, tooltip, base)
@@ -193,12 +197,10 @@ def plot_facet_forest(
         forest_chart = forest_chart.encode(
             y=alt.Y(
                 y,
-                title=None,
+                title=None,  # Remove color-related axis, so it's legend-only
                 axis=None,
             ),
-            color=alt.Color(
-                y,
-            ),
+            color=alt.Color(y),
         )
 
     if lower and upper:
