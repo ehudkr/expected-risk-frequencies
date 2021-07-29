@@ -102,28 +102,7 @@ def plot_single_forest(
 ):
     base = alt.Chart(data)
 
-    forest_chart = base.mark_point(
-        filled=True,
-        opacity=1,
-        # size=80,
-        # color='black'
-    ).encode(
-        x=alt.X(
-            x,
-            title=x,
-            # Can't define a x_scale = alt.Scale() variable before, for unknown reason:
-            scale=alt.Scale(
-                type="log",
-                nice=False,
-                padding=10,
-            ) if logscale else alt.Undefined,
-        ),
-        y=alt.Y(
-            y,
-            # title=y_name.capitalize(),
-        ),
-        size=alt.value(80),  # size=alt.Size(p_val_name)
-    )
+    forest_chart = _get_forest_points(x, y, logscale, data, base)
 
     if lower and upper:
         error_bars = _get_error_bars(y, lower, upper, base)
@@ -193,26 +172,7 @@ def plot_facet_forest(
     if hue:  # TODO: explain
         hue, y = y, hue
 
-    forest_chart = base.mark_point(
-        filled=True,
-        opacity=1,
-        size=80,
-    ).encode(
-        x=alt.X(
-            x,
-            title=x,
-            # Can't define a x_scale = alt.Scale() variable before, for unknown reason:
-            scale=alt.Scale(
-                type="log",
-                nice=False,
-                padding=10,
-            ) if logscale else alt.Undefined,
-        ),
-        y=alt.Y(
-            y,
-        ),
-        tooltip=data.columns.tolist(),
-    )
+    forest_chart = _get_forest_points(x, y, logscale, data, base)
     if hue:
         forest_chart = forest_chart.encode(
             y=alt.Y(
@@ -272,6 +232,32 @@ def plot_facet_forest(
         ).configure_facet(
             spacing=13,  # TODO: row: 13, column: 5
         )
+    return forest_chart
+
+
+def _get_forest_points(x, y, logscale, data, chart=None):
+    forest_chart = chart.mark_point(
+        filled=True,
+        opacity=1,
+        size=80,
+        # color='black',
+    ).encode(
+        x=alt.X(
+            x,
+            title=x,
+            # Can't define a x_scale = alt.Scale() variable before, for unknown reason:
+            scale=alt.Scale(
+                type="log",
+                nice=False,
+                padding=10,
+            ) if logscale else alt.Undefined,
+        ),
+        y=alt.Y(
+            y,
+        ),
+        # size=alt.value(80),  # size=alt.Size(p_val_name)
+        tooltip=data.columns.tolist(),
+    )
     return forest_chart
 
 
