@@ -86,12 +86,13 @@ def plot_forest(
             precision=precision,
             configure=configure,
         )
-    chart = chart.properties(  # TODO: remove?
-        title={
-            'text': "Association of injectable contraceptive and discontinuation",
-            # 'anchor': 'middle'
-        }  # Avoid explicit `configure_title`
-    )
+
+    # chart = chart.properties(
+    #     title={
+    #         'text': title,
+    #         # 'anchor': 'middle'
+    #     }  # Avoid explicit `configure_title`
+    # )
     return chart
 
 
