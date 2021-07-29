@@ -2,7 +2,7 @@ import altair as alt
 from typing import Hashable, Optional
 
 
-def plot_forest(
+def forest_plot(
     x, y,
     data,
     hue=None,
