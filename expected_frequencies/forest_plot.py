@@ -9,8 +9,8 @@ def plot_forest(
     lower=None, upper=None,
     p_val=None,
     panel=None,
-    # TODO: add logscale
     neutral=None,
+    logscale=False,
     with_text=False,
     precision=2,
     configure=True,  # TODO: rename to "remove border"?
@@ -39,6 +39,8 @@ def plot_forest(
         Specifying column panels, a variable in `data
     neutral : float, optional
         Specifying a value of no-effect (e.g., 1.0 for odds-ratio or risk-ratios)
+    logscale : bool
+        Whether to plot the x-axis in log-scale
     with_text : bool
         Whether to add textual description of the effect.
         Only works if `hue` or `panel` are not specified.
@@ -65,6 +67,7 @@ def plot_forest(
             lower=lower, upper=upper,
             panel=panel,
             neutral=neutral,
+            logscale=logscale,
             configure=configure,
         )
     else:
@@ -73,6 +76,7 @@ def plot_forest(
             data=data,
             lower=lower, upper=upper,
             neutral=neutral,
+            logscale=logscale,
             with_text=with_text,
             precision=precision,
             configure=configure,
@@ -91,6 +95,7 @@ def plot_single_forest(
     data,
     lower=None, upper=None,
     neutral=None,
+    logscale=False,
     with_text=False,
     precision=2,
     configure=True,
@@ -106,11 +111,12 @@ def plot_single_forest(
         x=alt.X(
             x,
             title=x,
+            # Can't define a x_scale = alt.Scale() variable before, for unknown reason:
             scale=alt.Scale(
                 type="log",
                 nice=False,
-                padding=10
-            ),
+                padding=10,
+            ) if logscale else alt.Undefined,
         ),
         y=alt.Y(
             y,
@@ -190,6 +196,7 @@ def plot_facet_forest(
     lower=None, upper=None,
     panel=None,
     neutral=None,
+    logscale=False,
     configure=True,
 ):
     base = alt.Chart(
@@ -209,11 +216,12 @@ def plot_facet_forest(
         x=alt.X(
             x,
             title=x,
+            # Can't define a x_scale = alt.Scale() variable before, for unknown reason:
             scale=alt.Scale(
                 type="log",
                 nice=False,
                 padding=10,
-            ),
+            ) if logscale else alt.Undefined,
         ),
         y=alt.Y(
             y,
