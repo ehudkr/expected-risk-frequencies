@@ -124,26 +124,11 @@ def plot_single_forest(
     )
 
     if lower and upper:
-        error_bars = base.mark_errorbar(
-            ticks={"size": 6},
-            color='black'
-        ).encode(
-            x=alt.X(lower, title=''),
-            x2=alt.X2(upper, title=''),
-            y=alt.Y(y),
-        )
+        error_bars = _get_error_bars(y, lower, upper, base)
         forest_chart = error_bars + forest_chart
 
     if neutral:
-        neutral_threshold = base.transform_calculate(
-            neutral=f'{neutral}'
-        ).mark_rule(
-            color='grey',  # '#c5c6c7',
-            strokeDash=[8, 8],
-            strokeWidth=1.3,
-        ).encode(
-            x=alt.X('neutral:Q')
-        )
+        neutral_threshold = _get_no_effect_rule(neutral, base)
         forest_chart = neutral_threshold + forest_chart
 
     if with_text:
@@ -156,9 +141,7 @@ def plot_single_forest(
             upper=upper,
             precision=precision,
         )
-        text_chart = base.transform_calculate(
-            # text=""
-        ).mark_text(
+        text_chart = base.mark_text(
             align='left'
         ).encode(
             x=alt.value(0),
@@ -167,7 +150,6 @@ def plot_single_forest(
                 title=None,
                 axis=None,
             ),
-            # text=alt.Text(x_name, format=".2f"),
             text=alt.Text('text'),
         ).properties(
             title={"text": f"{x} {'[95% CI]' if lower and upper else ''}",
@@ -256,32 +238,15 @@ def plot_facet_forest(
         )
 
     if lower and upper:
-        error_bars = base.mark_errorbar(
-            ticks={"size": 6},
-            # color='black'
-        ).encode(
-            x=alt.X(lower, title=''),
-            x2=alt.X2(upper, title=''),
-            y=alt.Y(y),
-        )
+        error_bars = _get_error_bars(y, lower, upper, base)
         if hue:
             error_bars = error_bars.encode(
-                color=alt.Color(
-                    y,
-                ),
+                color=alt.Color(y),
             )
         forest_chart = error_bars + forest_chart
 
     if neutral:
-        neutral_threshold = base.transform_calculate(
-            neutral=f'{neutral}'
-        ).mark_rule(
-            color='grey',  # '#c5c6c7',
-            strokeDash=[8, 8],
-            strokeWidth=1.3,
-        ).encode(
-            x=alt.X('neutral:Q')
-        )
+        neutral_threshold = _get_no_effect_rule(neutral, base)
         forest_chart = neutral_threshold + forest_chart
 
     row = alt.Undefined
@@ -320,6 +285,37 @@ def plot_facet_forest(
             spacing=13,  # TODO: row: 13, column: 5
         )
     return forest_chart
+
+
+def _get_error_bars(y, lower, upper, chart=None):
+    if chart is None:
+        chart = alt.Chart()
+    error_bars = chart.mark_errorbar(
+        ticks={"size": 6},
+        color='black'
+    ).encode(
+        x=alt.X(lower, title=''),
+        x2=alt.X2(upper, title=''),
+        y=alt.Y(y),
+    )
+    return error_bars
+
+
+def _get_no_effect_rule(neutral, chart=None):
+    if chart is None:
+        chart = alt.Chart()
+    neutral_threshold = chart.transform_calculate(
+        neutral=f'{neutral}'
+    ).mark_rule(
+        color='grey',  # '#c5c6c7',
+        strokeDash=[8, 8],
+        strokeWidth=1.3,
+    ).encode(
+        x=alt.X('neutral:Q')
+    )
+    return neutral_threshold
+
+
 
 # ######################
 # ######################
